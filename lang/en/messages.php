@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'hero_title' => 'OlimChat.me',
+    'hero_subtitle' => 'Community of Hebrew students',
+    'hero_description' => 'Select your level (א/ב/ג/ד), choose 30-minute slots, get a free speaking partner.',
+    'start_now' => 'Start Now',
+    'how_it_works' => 'How it works',
+    'step_1' => 'Start the flow',
+    'step_2' => 'Choose the language',
+    'step_3' => 'Choose your levels',
+    'step_4' => 'Select convenient time slots',
+    'step_5' => 'See the matches',
+    'step_6' => 'Schedule a meeting',
+    'all_rights_reserved' => 'All rights reserved.',
+    'calendar_title' => 'Timeline',
+    'calendar_welcome' => 'Hi, :name! Here are your matches to talk',
+    'schedule_meeting' => 'Schedule a meeting',
+    'no_matches_found' => 'No matching users found at your level for the upcoming week.',
+    'day_today' => 'Today',
+    'day_tomorrow' => 'Tomorrow',
+    'access_prohibited' => 'Access prohibited. Please, use the link from telegram bot https://t.me/HebrewPeer2Peer_bot',
+    'forbidden_title' => 'Access Prohibited',
+    'forbidden_message' => 'To access this page, please use the personal link provided by our Telegram bot:',
+];
