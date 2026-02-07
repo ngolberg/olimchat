@@ -42,8 +42,13 @@ class BotLoginController extends Controller
             [
                 'name' => $name,
                 'password' => Str::random(32),
+                'tg_id' => $user->tg_id ?? null,
             ]
         );
+
+        if ($localUser->wasRecentlyCreated === false && isset($user->tg_id) && $localUser->tg_id !== (string)$user->tg_id) {
+            $localUser->update(['tg_id' => $user->tg_id]);
+        }
 
         Auth::login($localUser);
 

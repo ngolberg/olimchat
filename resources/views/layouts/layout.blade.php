@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="OlimChat.me - Your intelligent Telegram Bot assistant. Get instant answers, automate tasks, and boost productivity." />
-    <link rel="icon" href="/web/public/img/favicon.ico" sizes="any"/>
+    <link rel="icon" href="/favicon.ico" sizes="any"/>
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles / Scripts -->
