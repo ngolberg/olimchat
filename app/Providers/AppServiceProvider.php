@@ -11,7 +11,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\Longman\TelegramBot\Telegram::class, function ($app) {
+            $config = $app['config']['services.telegram'];
+            return new \Longman\TelegramBot\Telegram(
+                $config['bot_token'] ?? '',
+                $config['bot_username'] ?? ''
+            );
+        });
     }
 
     /**

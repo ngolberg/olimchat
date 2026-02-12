@@ -6,11 +6,11 @@ import App from './spa/App.jsx';
 
 const mount = document.getElementById('app');
 if (mount) {
-    createRoot(mount).render(
-        <React.StrictMode>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </React.StrictMode>
-    );
+  createRoot(mount).render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  );
 }
