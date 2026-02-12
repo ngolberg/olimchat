@@ -260,6 +260,7 @@ class MeetingController extends Controller
             })
             ->where('meeting_date', '>=', $now->format('Y-m-d'))
             ->where('meeting_date', '<=', $end->format('Y-m-d'))
+            ->where('status', '!=', 'declined')
             ->get();
 
         $meetingsBySlot = [];
@@ -373,10 +374,98 @@ class MeetingController extends Controller
     }
 
     /**
-     * Cancel a meeting invitation.
+     * Cancel a meeting (by either participant).
      */
     public function cancel(Request $request): JsonResponse
     {
+        $request->validate([
+            'meeting_id' => 'required|integer',
+        ]);
+
+        $localUser = Auth::user();
+        $botUser = DB::connection('mysql_bot')
+            ->table('users')
+            ->where('tg_id', $localUser->tg_id)
+            ->first();
+
+        if (!$botUser) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $meeting = DB::connection('mysql_bot')
+            ->table('meetings as m')
+            ->join('users as u1', 'u1.id', '=', 'm.inviter_id')
+            ->join('users as u2', 'u2.id', '=', 'm.invitee_id')
+            ->where('m.id', $request->input('meeting_id'))
+            ->select([
+                'm.*',
+                'u1.lang as inviter_lang', 'u1.tg_id as inviter_tg',
+                'u1.username as inviter_username', 'u1.first_name as inviter_name',
+                'u2.lang as invitee_lang', 'u2.tg_id as invitee_tg',
+                'u2.username as invitee_username', 'u2.first_name as invitee_name',
+            ])
+            ->first();
+
+        if (!$meeting) {
+            return response()->json(['error' => 'Meeting not found'], 404);
+        }
+
+        if ((int)$meeting->inviter_id !== (int)$botUser->id && (int)$meeting->invitee_id !== (int)$botUser->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        DB::connection('mysql_bot')
+            ->table('meetings')
+            ->where('id', $meeting->id)
+            ->update(['status' => 'declined']);
+
+        $actorId = (int)$botUser->id;
+        $otherId = ((int)$meeting->inviter_id === $actorId) ? (int)$meeting->invitee_id : (int)$meeting->inviter_id;
+        $this->logMeetingActivity('meeting_canceled', $actorId, $otherId);
+
+        $actorIsInviter = ((int)$meeting->inviter_id === $actorId);
+        $dateHuman = !empty($meeting->meeting_date) ? Carbon::parse($meeting->meeting_date, 'Asia/Jerusalem')->format('d.m.Y') : '';
+
+        // Build user links
+        $inviterName = $meeting->inviter_name ?: ($meeting->inviter_username ? '@' . $meeting->inviter_username : 'Participant');
+        $inviteeName = $meeting->invitee_name ?: ($meeting->invitee_username ? '@' . $meeting->invitee_username : 'Participant');
+        $inviterLink = $meeting->inviter_username
+            ? '<a href="https://t.me/' . e($meeting->inviter_username) . '">@' . e($meeting->inviter_username) . '</a>'
+            : '<a href="tg://user?id=' . $meeting->inviter_tg . '">' . e($inviterName) . '</a>';
+        $inviteeLink = $meeting->invitee_username
+            ? '<a href="https://t.me/' . e($meeting->invitee_username) . '">@' . e($meeting->invitee_username) . '</a>'
+            : '<a href="tg://user?id=' . $meeting->invitee_tg . '">' . e($inviteeName) . '</a>';
+
+        // Notify inviter
+        $inviterLang = $meeting->inviter_lang ?: 'ru';
+        $weekdayNamesInv = $this->getWeekdayNames($inviterLang);
+        $slotLabelInv = ($weekdayNamesInv[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
+        $msgInviter = $actorIsInviter
+            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meeting.you_canceled', $inviterLang))
+            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meeting.canceled_by_user', $inviterLang));
+        TelegramRequest::sendMessage([
+            'chat_id' => (string)$meeting->inviter_tg,
+            'text' => $msgInviter,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+        ]);
+        $this->logMeetingActivity('cancellation_notified_inviter', (int)$meeting->inviter_id, $actorId);
+
+        // Notify invitee
+        $inviteeLang = $meeting->invitee_lang ?: 'ru';
+        $weekdayNamesIne = $this->getWeekdayNames($inviteeLang);
+        $slotLabelIne = ($weekdayNamesIne[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
+        $msgInvitee = !$actorIsInviter
+            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meeting.you_canceled', $inviteeLang))
+            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meeting.canceled_by_user', $inviteeLang));
+        TelegramRequest::sendMessage([
+            'chat_id' => (string)$meeting->invitee_tg,
+            'text' => $msgInvitee,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+        ]);
+        $this->logMeetingActivity('cancellation_notified_invitee', (int)$meeting->invitee_id, $actorId);
+
         return response()->json(['success' => true]);
     }
 }

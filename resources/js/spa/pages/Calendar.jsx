@@ -8,6 +8,7 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
   const [uploading, setUploading] = useState(false);
   const [uploadedPreview, setUploadedPreview] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [loadingSlot, setLoadingSlot] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -84,15 +85,10 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
   };
 
   const handleScheduleMeeting = (slot, day) => {
-    if (!slot?.user?.id) {
-      alert(messages?.error_scheduling || 'Failed to schedule meeting: Missing user ID.');
-      console.error('Missing user ID in slot:', slot);
-      return;
-    }
+    if (!slot?.user?.id) return;
 
-    if (!window.confirm(messages?.confirm_schedule || 'Do you want to schedule a meeting?')) {
-      return;
-    }
+    const slotKey = `schedule-${day.date}-${slot.time}-${slot.user.id}`;
+    setLoadingSlot(slotKey);
 
     fetch('/api/meeting/create', {
       method: 'POST',
@@ -113,19 +109,17 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
         return r.json();
       })
       .then(() => {
-        alert(messages?.meeting_scheduled || 'Meeting scheduled successfully! Check your Telegram bot.');
-        // Refresh calendar
         fetch('/api/calendar', { credentials: 'same-origin' })
           .then(r => r.json())
           .then(data => setDays(data.days || []));
       })
-      .catch(err => {
-        console.error(err);
-        alert(messages?.error_scheduling || 'Failed to schedule meeting.');
-      });
+      .catch(err => console.error(err))
+      .finally(() => setLoadingSlot(null));
   };
 
   const handleMeetingAction = (meetingId, action) => {
+    setLoadingSlot(`${action}-${meetingId}`);
+
     fetch(`/api/meeting/${action}`, {
       method: 'POST',
       headers: {
@@ -141,15 +135,12 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
         return r.json();
       })
       .then(() => {
-        // Refresh calendar
         fetch('/api/calendar', { credentials: 'same-origin' })
           .then(r => r.json())
           .then(data => setDays(data.days || []));
       })
-      .catch(err => {
-        console.error(err);
-        alert(`Failed to ${action} meeting.`);
-      });
+      .catch(err => console.error(err))
+      .finally(() => setLoadingSlot(null));
   };
 
   if (loading) {
@@ -257,9 +248,14 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
                                       {slot.meeting.role === 'inviter' ? (
                                         <button
                                           onClick={() => handleMeetingAction(slot.meeting.id, 'cancel')}
-                                          className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm"
+                                          disabled={loadingSlot === `cancel-${slot.meeting.id}`}
+                                          className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                                         >
-                                          cancel invitation
+                                          {loadingSlot === `cancel-${slot.meeting.id}` ? (
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                          ) : (
+                                            'cancel invitation'
+                                          )}
                                         </button>
                                       ) : (
                                         <>
@@ -283,12 +279,19 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
                               ) : (
                                 <button
                                   onClick={() => handleScheduleMeeting(slot, day)}
-                                  className="mt-2 w-full sm:w-auto px-3 py-1.5 bg-sky-600 text-white rounded-lg text-xs font-bold hover:bg-sky-700 transition-all shadow-sm flex items-center justify-center gap-1"
+                                  disabled={loadingSlot === `schedule-${day.date}-${slot.time}-${slot.user.id}`}
+                                  className="mt-2 w-full sm:w-auto px-3 py-1.5 bg-sky-600 text-white rounded-lg text-xs font-bold hover:bg-sky-700 transition-all shadow-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <span>{messages?.schedule_meeting || 'Schedule meeting'}</span>
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
-                                  </svg>
+                                  {loadingSlot === `schedule-${day.date}-${slot.time}-${slot.user.id}` ? (
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                  ) : (
+                                    <>
+                                      <span>{messages?.schedule_meeting}</span>
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
+                                      </svg>
+                                    </>
+                                  )}
                                 </button>
                               )}
                             </div>
