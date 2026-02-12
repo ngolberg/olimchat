@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
 class AppConfigController extends Controller
@@ -14,8 +15,25 @@ class AppConfigController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $user = Auth::user();
+        if ($user && $user->lang) {
+            app()->setLocale($user->lang);
+        }
+
+        $userImage = null;
+        if ($user && $user->tg_id) {
+            $botUser = DB::connection('mysql_bot')
+                ->table('users')
+                ->where('tg_id', $user->tg_id)
+                ->first(['image']);
+            if ($botUser && $botUser->image) {
+                $userImage = '/photos/' . $botUser->image;
+            }
+        }
+
         return response()->json([
             'user' => Auth::user(),
+            'user_image' => $userImage,
             'messages' => [
                 'hero_title' => __('messages.hero_title'),
                 'hero_subtitle' => __('messages.hero_subtitle'),
@@ -34,6 +52,13 @@ class AppConfigController extends Controller
                 'schedule_meeting' => __('messages.schedule_meeting'),
                 'day_today' => __('messages.day_today'),
                 'day_tomorrow' => __('messages.day_tomorrow'),
+                'upload_photo_title' => __('messages.upload_photo_title'),
+                'upload_photo_message' => __('messages.upload_photo_message'),
+                'upload_photo_done' => __('messages.upload_photo_done'),
+                'upload_photo_another' => __('messages.upload_photo_another'),
+                'not_found_title' => __('messages.not_found_title'),
+                'not_found_message' => __('messages.not_found_message'),
+                'not_found_go_calendar' => __('messages.not_found_go_calendar'),
             ],
             'auth' => Auth::check(),
         ]);

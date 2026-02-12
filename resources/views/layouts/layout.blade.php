@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="OlimChat.me - Your intelligent Telegram Bot assistant. Get instant answers, automate tasks, and boost productivity." />
     <link rel="icon" href="/favicon.ico" sizes="any"/>
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'OlimChat') }}</title>
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @endif
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
