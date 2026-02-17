@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-export default function Calendar({ messages, auth, user, userImage, setUserImage }) {
+export default function Meetings({ messages, auth, user, userImage, setUserImage }) {
   const [days, setDays] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openDays, setOpenDays] = useState({});
@@ -17,7 +17,7 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
       return;
     }
     setLoading(true);
-    fetch('/api/calendar', { credentials: 'same-origin' })
+    fetch('/api/meetings', { credentials: 'same-origin' })
       .then(r => {
         if (!r.ok) throw new Error('Failed');
         return r.json();
@@ -109,7 +109,7 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
         return r.json();
       })
       .then(() => {
-        fetch('/api/calendar', { credentials: 'same-origin' })
+        fetch('/api/meetings', { credentials: 'same-origin' })
           .then(r => r.json())
           .then(data => setDays(data.days || []));
       })
@@ -135,7 +135,7 @@ export default function Calendar({ messages, auth, user, userImage, setUserImage
         return r.json();
       })
       .then(() => {
-        fetch('/api/calendar', { credentials: 'same-origin' })
+        fetch('/api/meetings', { credentials: 'same-origin' })
           .then(r => r.json())
           .then(data => setDays(data.days || []));
       })

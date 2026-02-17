@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home.jsx';
-import Calendar from './pages/Calendar.jsx';
+import Meetings from './pages/Meetings.jsx';
+import MyMeetings from './pages/MyMeetings.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 function Navbar({ messages, user, onLanguageChange }) {
@@ -20,7 +21,8 @@ function Navbar({ messages, user, onLanguageChange }) {
             {location.pathname === '/' && (
               <li><a href="#how-it-works" className="hover:text-sky-600 transition-colors">{messages?.how_it_works || 'How it works'}</a></li>
             )}
-            <li><Link to="/calendar" className="hover:text-sky-600 transition-colors">{messages?.calendar_title}</Link></li>
+            <li><Link to="/meetings" className="hover:text-sky-600 transition-colors">{messages?.calendar_title}</Link></li>
+            <li><Link to="/my-meetings" className="hover:text-sky-600 transition-colors">{messages?.my_meetings_title}</Link></li>
           </ul>
           {user && (
             <div className="flex gap-2 ml-4 text-sm font-medium">
@@ -96,7 +98,8 @@ export default function App() {
       <main className="flex-grow flex flex-col">
         <Routes>
           <Route path="/" element={<Home messages={messages} />} />
-          <Route path="/calendar" element={<Calendar messages={messages} auth={auth} user={user} userImage={userImage} setUserImage={setUserImage} />} />
+          <Route path="/meetings" element={<Meetings messages={messages} auth={auth} user={user} userImage={userImage} setUserImage={setUserImage} />} />
+          <Route path="/my-meetings" element={<MyMeetings messages={messages} auth={auth} user={user} />} />
           <Route path="*" element={<NotFound messages={messages} />} />
         </Routes>
       </main>

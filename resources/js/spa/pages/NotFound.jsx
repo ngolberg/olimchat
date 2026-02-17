@@ -19,7 +19,7 @@ export default function NotFound({ messages }) {
             {messages.not_found_message}
           </p>
           <Link
-            to="/calendar"
+            to="/meetings"
             className="inline-flex items-center gap-2 px-6 md:px-10 py-3 md:py-4 rounded-full bg-sky-600 text-white font-bold shadow-lg hover:bg-sky-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
           >
             <span>{messages.not_found_go_calendar}</span>

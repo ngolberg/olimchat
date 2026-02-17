@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('api')->group(function () {
     Route::get('/config', [AppConfigController::class, 'index']);
     Route::middleware('auth')->post('/user/language', [LanguageController::class, 'update']);
-    Route::middleware('auth')->get('/calendar', [MeetingController::class, 'index']);
+    Route::middleware('auth')->get('/meetings', [MeetingController::class, 'index']);
+    Route::middleware('auth')->get('/my-meetings', [MeetingController::class, 'myMeetings']);
     Route::middleware('auth')->post('/meeting/create', [MeetingController::class, 'store']);
     Route::middleware('auth')->post('/meeting/accept', [MeetingController::class, 'accept']);
     Route::middleware('auth')->post('/meeting/decline', [MeetingController::class, 'decline']);
@@ -34,7 +35,7 @@ Route::get('/{any}', function () {
 });
 
 Route::middleware('auth')->group(function() {
-    Route::get('/calendar', [MeetingsController::class, 'index'])->name('calendar');
+    Route::get('/meetings', [MeetingsController::class, 'index'])->name('meetings');
 });*/
 
 require __DIR__.'/auth.php';
