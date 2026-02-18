@@ -30,6 +30,8 @@ return [
     'not_found_title' => 'Страница не найдена',
     'not_found_message' => 'Страница, которую вы ищете, не существует или была перемещена.',
     'not_found_go_calendar' => 'В расписание',
+    'filter_users' => 'Фильтр по пользователям',
+    'filter_select_all' => 'Выбрать всех',
     'my_meetings_title' => 'Мои встречи',
     'my_meetings_welcome' => 'Привет, :name! Вот твои предстоящие встречи.',
     'my_meetings_none' => 'У тебя нет предстоящих встреч.',

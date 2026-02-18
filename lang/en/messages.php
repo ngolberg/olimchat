@@ -30,6 +30,8 @@ return [
     'not_found_title' => 'Page Not Found',
     'not_found_message' => 'The page you are looking for does not exist or has been moved.',
     'not_found_go_calendar' => 'Go to Calendar',
+    'filter_users' => 'Filter users',
+    'filter_select_all' => 'Select all',
     'my_meetings_title' => 'My Meetings',
     'my_meetings_welcome' => 'Hi, :name! Here are your upcoming meetings.',
     'my_meetings_none' => 'You have no upcoming meetings.',

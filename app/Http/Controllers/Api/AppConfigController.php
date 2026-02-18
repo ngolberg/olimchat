@@ -59,6 +59,8 @@ class AppConfigController extends Controller
                 'not_found_title' => __('messages.not_found_title'),
                 'not_found_message' => __('messages.not_found_message'),
                 'not_found_go_calendar' => __('messages.not_found_go_calendar'),
+                'filter_users' => __('messages.filter_users'),
+                'filter_select_all' => __('messages.filter_select_all'),
                 'my_meetings_title' => __('messages.my_meetings_title'),
                 'my_meetings_welcome' => __('messages.my_meetings_welcome', ['name' => Auth::user() ? Auth::user()->name : '']),
                 'my_meetings_none' => __('messages.my_meetings_none'),

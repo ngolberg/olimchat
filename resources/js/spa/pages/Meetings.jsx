@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 
 export default function Meetings({ messages, auth, user, userImage, setUserImage }) {
   const [days, setDays] = useState(null);
@@ -9,7 +9,10 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
   const [uploadedPreview, setUploadedPreview] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [loadingSlot, setLoadingSlot] = useState(null);
+  const [selectedUserIds, setSelectedUserIds] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const fileInputRef = useRef(null);
+  const filterRef = useRef(null);
 
   useEffect(() => {
     if (!auth) {
@@ -42,6 +45,73 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
     }, 5000);
     return () => clearTimeout(timer);
   }, [auth, userImage]);
+
+  const allUsers = useMemo(() => {
+    if (!days || days.length === 0) return [];
+    const map = new Map();
+    for (const day of days) {
+      for (const slots of Object.values(day.times)) {
+        for (const slot of slots) {
+          if (!map.has(slot.user.id)) {
+            map.set(slot.user.id, slot.user);
+          }
+        }
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.first_name.localeCompare(b.first_name));
+  }, [days]);
+
+  useEffect(() => {
+    if (allUsers.length > 0 && selectedUserIds === null) {
+      setSelectedUserIds(new Set(allUsers.map(u => u.id)));
+    }
+  }, [allUsers]);
+
+  useEffect(() => {
+    if (!filterOpen) return;
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterOpen]);
+
+  const toggleUserFilter = (userId) => {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev);
+      if (next.has(userId)) {
+        next.delete(userId);
+      } else {
+        next.add(userId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const allSelected = selectedUserIds && selectedUserIds.size === allUsers.length;
+    if (allSelected) {
+      setSelectedUserIds(new Set());
+    } else {
+      setSelectedUserIds(new Set(allUsers.map(u => u.id)));
+    }
+  };
+
+  const filteredDays = useMemo(() => {
+    if (!days || !selectedUserIds) return days;
+    return days.map(day => {
+      const filteredTimes = {};
+      for (const [time, slots] of Object.entries(day.times)) {
+        const filtered = slots.filter(slot => selectedUserIds.has(slot.user.id));
+        if (filtered.length > 0) {
+          filteredTimes[time] = filtered;
+        }
+      }
+      return { ...day, times: filteredTimes };
+    }).filter(day => Object.keys(day.times).length > 0);
+  }, [days, selectedUserIds]);
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
@@ -182,13 +252,69 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
   return (
     <section className="bg-gradient-to-br from-slate-50 to-slate-200/70 flex-grow py-12">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold text-slate-900 mb-4">{messages?.calendar_title || 'Calendar'}</h1>
           <p className="text-lg text-slate-600">{messages?.calendar_welcome?.replace('{name}', user?.name || '')}</p>
         </div>
 
+        {allUsers.length > 1 && (
+          <div className="relative mb-6" ref={filterRef}>
+            <button
+              onClick={() => setFilterOpen(prev => !prev)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-sky-300 hover:text-sky-600 transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span>{messages?.filter_users || 'Filter users'}</span>
+              {selectedUserIds && selectedUserIds.size < allUsers.length && (
+                <span className="bg-sky-100 text-sky-700 text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {selectedUserIds.size}/{allUsers.length}
+                </span>
+              )}
+              <svg
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${filterOpen ? 'rotate-180' : ''}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {filterOpen && (
+              <div className="absolute left-0 top-full mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-2 max-h-72 overflow-y-auto">
+                <label className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 cursor-pointer border-b border-slate-100">
+                  <input
+                    type="checkbox"
+                    checked={selectedUserIds && selectedUserIds.size === allUsers.length}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  />
+                  <span className="text-sm font-semibold text-slate-700">{messages?.filter_select_all || 'Select all'}</span>
+                </label>
+                {allUsers.map(u => (
+                  <label key={u.id} className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedUserIds?.has(u.id) || false}
+                      onChange={() => toggleUserFilter(u.id)}
+                      className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                    />
+                    <img src={u.image} alt={u.first_name} className="w-7 h-7 rounded-full object-cover border border-slate-100" />
+                    <span className="text-sm text-slate-700 truncate">{u.first_name} {u.last_name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {filteredDays && filteredDays.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-slate-200">
+            <p className="text-xl text-slate-600">{messages?.no_matches_found || 'No matches found'}</p>
+          </div>
+        ) : (
         <div className="space-y-6">
-          {days.map((day, idx) => (
+          {filteredDays.map((day, idx) => (
             <div className="relative" key={idx}>
               <div
                 className="sticky top-20 z-10 bg-slate-50/90 backdrop-blur-md py-3 mb-2 cursor-pointer group rounded-xl"
@@ -305,6 +431,7 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Photo Upload Modal */}
