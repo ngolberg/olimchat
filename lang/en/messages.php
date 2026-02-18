@@ -27,6 +27,7 @@ return [
     'upload_photo_message' => 'Your Telegram profile has no photo :( Please upload a photo so other participants know who they\'ll be talking to. This significantly increases your chances of finding a suitable conversation partner!',
     'upload_photo_done' => 'Cool! Close the pop-up',
     'upload_photo_another' => 'Upload another',
+    'update_photo' => 'Update photo',
     'not_found_title' => 'Page Not Found',
     'not_found_message' => 'The page you are looking for does not exist or has been moved.',
     'not_found_go_calendar' => 'Go to Calendar',

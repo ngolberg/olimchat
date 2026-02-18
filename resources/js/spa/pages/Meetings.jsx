@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 
-export default function Meetings({ messages, auth, user, userImage, setUserImage }) {
+export default function Meetings({ messages, auth, user, userImage, onOpenUploadModal }) {
   const [days, setDays] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openDays, setOpenDays] = useState({});
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedPreview, setUploadedPreview] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [loadingSlot, setLoadingSlot] = useState(null);
   const [selectedUserIds, setSelectedUserIds] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
-  const fileInputRef = useRef(null);
   const filterRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +37,7 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
   useEffect(() => {
     if (!auth || userImage) return;
     const timer = setTimeout(() => {
-      setShowUploadModal(true);
+      onOpenUploadModal();
     }, 5000);
     return () => clearTimeout(timer);
   }, [auth, userImage]);
@@ -112,40 +108,6 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
       return { ...day, times: filteredTimes };
     }).filter(day => Object.keys(day.times).length > 0);
   }, [days, selectedUserIds]);
-
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('photo', file);
-
-    fetch('/api/user/photo', {
-      method: 'POST',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-      },
-      body: formData,
-      credentials: 'same-origin'
-    })
-      .then(r => {
-        if (!r.ok) throw new Error('Upload failed');
-        return r.json();
-      })
-      .then((data) => {
-        if (data.image) {
-          setUserImage(data.image);
-          setUploadedPreview(data.image);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Failed to upload photo.');
-      })
-      .finally(() => setUploading(false));
-  };
 
   const toggleDay = (idx) => {
     setOpenDays(prev => ({
@@ -433,85 +395,6 @@ export default function Meetings({ messages, auth, user, userImage, setUserImage
         </div>
         )}
       </div>
-
-      {/* Photo Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => { setShowUploadModal(false); setUploadedPreview(null); }}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-[600px] p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-end mb-2">
-              <button
-                onClick={() => { setShowUploadModal(false); setUploadedPreview(null); }}
-                className="text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {uploadedPreview ? (
-              <div className="flex flex-col items-center">
-                <img
-                  src={uploadedPreview}
-                  alt="Uploaded photo"
-                  className="w-24 h-24 rounded-full object-cover border border-slate-100 mb-6"
-                />
-                <div className="flex flex-col sm:flex-row gap-3 w-full">
-                  <button
-                    onClick={() => { setShowUploadModal(false); setUploadedPreview(null); }}
-                    className="flex-1 px-4 py-3 bg-sky-600 text-white rounded-xl font-bold hover:bg-sky-700 transition-colors shadow-sm"
-                  >
-                    {messages.upload_photo_another}
-                  </button>
-                  <button
-                    onClick={() => { setUploadedPreview(null); fileInputRef.current?.click(); }}
-                    className="flex-1 px-4 py-3 bg-white text-sky-600 border border-sky-200 rounded-xl font-bold hover:bg-sky-50 transition-colors shadow-sm"
-                  >
-                    {messages.upload_photo_done}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                  {messages.upload_photo_title}
-                </h3>
-                <p className="text-slate-600 mb-6">
-                  {messages.upload_photo_message}
-                </p>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="w-full px-4 py-3 bg-sky-600 text-white rounded-xl font-bold hover:bg-sky-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {uploading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span>{messages.upload_photo_title}</span>
-                    </>
-                  )}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Image Preview Modal */}
       {previewImage && (
