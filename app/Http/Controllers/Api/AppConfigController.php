@@ -34,10 +34,15 @@ class AppConfigController extends Controller
         return response()->json([
             'user' => Auth::user(),
             'user_image' => $userImage,
+            'bot_url' => config('services.telegram.bot_url'),
             'messages' => [
                 'hero_title' => __('messages.hero_title'),
                 'hero_subtitle' => __('messages.hero_subtitle'),
                 'hero_description' => __('messages.hero_description'),
+                'hero_bullet_1' => __('messages.hero_bullet_1'),
+                'hero_bullet_2' => __('messages.hero_bullet_2'),
+                'hero_bullet_3' => __('messages.hero_bullet_3'),
+                'hero_bullet_4' => __('messages.hero_bullet_4'),
                 'start_now' => __('messages.start_now'),
                 'how_it_works' => __('messages.how_it_works'),
                 'step_1' => __('messages.step_1'),

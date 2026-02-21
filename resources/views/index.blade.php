@@ -12,7 +12,7 @@
                         {{ __('messages.hero_description') }}
                     </p>
                     <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="https://t.me/HebrewPeer2Peer_bot" class="inline-block px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{{ __('messages.start_now') }}</a>
+                        <a href="{{ config('services.telegram.bot_url') }}" class="inline-block px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{{ __('messages.start_now') }}</a>
                     </div>
                 </div>
                 <div class="order-1 md:order-2 flex justify-center">

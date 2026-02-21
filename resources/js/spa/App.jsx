@@ -5,7 +5,7 @@ import Meetings from './pages/Meetings.jsx';
 import MyMeetings from './pages/MyMeetings.jsx';
 import NotFound from './pages/NotFound.jsx';
 
-function Navbar({ messages, user, userImage, onLanguageChange, onOpenUploadModal }) {
+function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUploadModal }) {
   const location = useLocation();
   const currentLang = user?.lang || 'ru';
   const [profileOpen, setProfileOpen] = useState(false);
@@ -31,9 +31,6 @@ function Navbar({ messages, user, userImage, onLanguageChange, onOpenUploadModal
         </Link>
         <div className="flex items-center gap-3 sm:gap-6">
           <ul className="hidden sm:flex items-center gap-6 text-gray-700 font-medium">
-            {location.pathname === '/' && (
-              <li><a href="#how-it-works" className="hover:text-sky-600 transition-colors">{messages?.how_it_works || 'How it works'}</a></li>
-            )}
             <li><Link to="/meetings" className="hover:text-sky-600 transition-colors">{messages?.calendar_title}</Link></li>
             <li><Link to="/my-meetings" className="hover:text-sky-600 transition-colors">{messages?.my_meetings_title}</Link></li>
           </ul>
@@ -53,6 +50,14 @@ function Navbar({ messages, user, userImage, onLanguageChange, onOpenUploadModal
                 RU
               </button>
             </div>
+          )}
+          {!user && (
+            <a
+              href={botUrl}
+              className="px-4 py-2 bg-sky-600 text-white text-sm font-semibold rounded-lg hover:bg-sky-700 transition-colors shadow-sm"
+            >
+              {messages?.start_now || 'Start Now'}
+            </a>
           )}
           {user && (
             <div className="relative" ref={profileRef}>
@@ -118,6 +123,7 @@ function Navbar({ messages, user, userImage, onLanguageChange, onOpenUploadModal
 
 export default function App() {
   const [messages, setMessages] = useState({});
+  const [botUrl, setBotUrl] = useState('');
   const [auth, setAuth] = useState(false);
   const [user, setUser] = useState(null);
   const [userImage, setUserImage] = useState(null);
@@ -131,6 +137,7 @@ export default function App() {
       .then(r => r.json())
       .then((data) => {
         setMessages(data.messages || {});
+        setBotUrl(data.bot_url || '');
         setAuth(Boolean(data.auth));
         setUser(data.user || null);
         setUserImage(data.user_image || null);
@@ -206,12 +213,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-500 to-purple-600 text-gray-800">
-      <Navbar messages={messages} user={user} userImage={userImage} onLanguageChange={handleLanguageChange} onOpenUploadModal={handleOpenUploadModal} />
+      <Navbar messages={messages} botUrl={botUrl} user={user} userImage={userImage} onLanguageChange={handleLanguageChange} onOpenUploadModal={handleOpenUploadModal} />
       <main className="flex-grow flex flex-col">
         <Routes>
-          <Route path="/" element={<Home messages={messages} />} />
-          <Route path="/meetings" element={<Meetings messages={messages} auth={auth} user={user} userImage={userImage} onOpenUploadModal={handleOpenUploadModal} />} />
-          <Route path="/my-meetings" element={<MyMeetings messages={messages} auth={auth} user={user} />} />
+          <Route path="/" element={<Home messages={messages} botUrl={botUrl} />} />
+          <Route path="/meetings" element={<Meetings messages={messages} botUrl={botUrl} auth={auth} user={user} userImage={userImage} onOpenUploadModal={handleOpenUploadModal} />} />
+          <Route path="/my-meetings" element={<MyMeetings messages={messages} botUrl={botUrl} auth={auth} user={user} />} />
           <Route path="*" element={<NotFound messages={messages} />} />
         </Routes>
       </main>

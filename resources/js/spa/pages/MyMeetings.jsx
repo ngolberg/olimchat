@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function MyMeetings({ messages, auth, user }) {
+export default function MyMeetings({ messages, botUrl, auth, user }) {
   const [meetings, setMeetings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingAction, setLoadingAction] = useState(null);
@@ -64,7 +64,7 @@ export default function MyMeetings({ messages, auth, user }) {
         <div className="max-w-6xl mx-auto px-6">
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-slate-200">
             <p className="text-xl text-slate-600">Please sign in via Telegram bot to see your meetings.</p>
-            <a href="https://t.me/HebrewPeer2Peer_bot" className="mt-4 inline-block px-6 py-2 bg-sky-600 text-white rounded-lg">Open Bot</a>
+            <a href={botUrl} className="mt-4 inline-block px-6 py-2 bg-sky-600 text-white rounded-lg">Open Bot</a>
           </div>
         </div>
       </section>

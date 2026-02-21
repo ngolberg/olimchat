@@ -14,7 +14,7 @@
                 </div>
                 <h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-slate-800">{{ __('messages.forbidden_title') }}</h1>
                 <p class="text-lg md:text-xl mb-8 leading-relaxed text-slate-600">{{ __('messages.forbidden_message') }}</p>
-                <a href="https://t.me/HebrewPeer2Peer_bot" class="inline-flex items-center gap-2 px-6 md:px-10 py-3 md:py-4 rounded-full bg-sky-600 text-white font-bold shadow-lg hover:bg-sky-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                <a href="{{ config('services.telegram.bot_url') }}" class="inline-flex items-center gap-2 px-6 md:px-10 py-3 md:py-4 rounded-full bg-sky-600 text-white font-bold shadow-lg hover:bg-sky-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
                     <span>@HebrewPeer2Peer_bot</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>

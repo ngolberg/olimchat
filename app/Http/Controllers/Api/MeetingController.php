@@ -106,11 +106,11 @@ class MeetingController extends Controller
             $weekdayNamesInvitee = $this->getWeekdayNames($inviteeLang);
             $slotLabel = ($weekdayNamesInvitee[$weekdayIso] ?? $weekdayIso) . ', ' . $dateHuman . ' ' . $timeStr;
 
-            $inviteText = $invLink . $this->getMsg('meet.invite_wants_to_meet_prefix', $inviteeLang) . e($slotLabel) . '. ' . $this->getMsg('meet.confirm_question', $inviteeLang);
+            $inviteText = $invLink . __('messages.meet.invite_wants_to_meet_prefix', [], $inviteeLang) . e($slotLabel) . '. ' . __('messages.meet.confirm_question', [], $inviteeLang);
 
             $kb = new InlineKeyboard([
-                new InlineKeyboardButton(['text' => $this->getMsg('buttons.confirm', $inviteeLang), 'callback_data' => 'meetans|' . $meetingId . '|ok']),
-                new InlineKeyboardButton(['text' => $this->getMsg('buttons.decline', $inviteeLang), 'callback_data' => 'meetans|' . $meetingId . '|no']),
+                new InlineKeyboardButton(['text' => __('messages.buttons.confirm', [], $inviteeLang), 'callback_data' => 'meetans|' . $meetingId . '|ok']),
+                new InlineKeyboardButton(['text' => __('messages.buttons.decline', [], $inviteeLang), 'callback_data' => 'meetans|' . $meetingId . '|no']),
             ]);
 
             // Send to invitee
@@ -130,7 +130,7 @@ class MeetingController extends Controller
 
             TelegramRequest::sendMessage([
                 'chat_id' => $inviterBotUser->tg_id,
-                'text' => str_replace('{{slot}}', e($slotLabelInviter), $this->getMsg('meet.request_sent', $inviterLang)),
+                'text' => str_replace('{{slot}}', e($slotLabelInviter), __('messages.meet.request_sent', [], $inviterLang)),
                 'parse_mode' => 'HTML',
                 'disable_web_page_preview' => true,
             ]);
@@ -144,26 +144,16 @@ class MeetingController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    private function getMsg(string $key, string $lang): string
-    {
-        $file = base_path('../hebrewPeer2Peer/locales/' . $lang . '/messages.php');
-        if (!file_exists($file)) {
-            $file = base_path('../hebrewPeer2Peer/locales/ru/messages.php');
-        }
-        $messages = require $file;
-        return $messages[$key] ?? $key;
-    }
-
     private function getWeekdayNames(string $lang): array
     {
         return [
-            1 => $this->getMsg('weekdays.1', $lang),
-            2 => $this->getMsg('weekdays.2', $lang),
-            3 => $this->getMsg('weekdays.3', $lang),
-            4 => $this->getMsg('weekdays.4', $lang),
-            5 => $this->getMsg('weekdays.5', $lang),
-            6 => $this->getMsg('weekdays.6', $lang),
-            7 => $this->getMsg('weekdays.7', $lang),
+            1 => __('messages.weekdays.1', [], $lang),
+            2 => __('messages.weekdays.2', [], $lang),
+            3 => __('messages.weekdays.3', [], $lang),
+            4 => __('messages.weekdays.4', [], $lang),
+            5 => __('messages.weekdays.5', [], $lang),
+            6 => __('messages.weekdays.6', [], $lang),
+            7 => __('messages.weekdays.7', [], $lang),
         ];
     }
 
@@ -503,7 +493,7 @@ class MeetingController extends Controller
         $inviterLang = $meeting->inviter_lang ?: 'ru';
         $weekdayNamesInv = $this->getWeekdayNames($inviterLang);
         $slotLabelInv = ($weekdayNamesInv[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
-        $msgInviter = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meet.inviter_notif_accepted', $inviterLang));
+        $msgInviter = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], __('messages.meet.inviter_notif_accepted', [], $inviterLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->inviter_tg,
             'text' => $msgInviter,
@@ -516,7 +506,7 @@ class MeetingController extends Controller
         $inviteeLang = $meeting->invitee_lang ?: 'ru';
         $weekdayNamesIne = $this->getWeekdayNames($inviteeLang);
         $slotLabelIne = ($weekdayNamesIne[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
-        $msgInvitee = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meet.you_confirmed', $inviteeLang));
+        $msgInvitee = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], __('messages.meet.you_confirmed', [], $inviteeLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->invitee_tg,
             'text' => $msgInvitee,
@@ -596,7 +586,7 @@ class MeetingController extends Controller
         $inviterLang = $meeting->inviter_lang ?: 'ru';
         $weekdayNamesInv = $this->getWeekdayNames($inviterLang);
         $slotLabelInv = ($weekdayNamesInv[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
-        $msgInviter = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meet.inviter_notif_declined', $inviterLang));
+        $msgInviter = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], __('messages.meet.inviter_notif_declined', [], $inviterLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->inviter_tg,
             'text' => $msgInviter,
@@ -609,7 +599,7 @@ class MeetingController extends Controller
         $inviteeLang = $meeting->invitee_lang ?: 'ru';
         $weekdayNamesIne = $this->getWeekdayNames($inviteeLang);
         $slotLabelIne = ($weekdayNamesIne[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
-        $msgInvitee = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meet.you_declined', $inviteeLang));
+        $msgInvitee = str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], __('messages.meet.you_declined', [], $inviteeLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->invitee_tg,
             'text' => $msgInvitee,
@@ -689,8 +679,8 @@ class MeetingController extends Controller
         $weekdayNamesInv = $this->getWeekdayNames($inviterLang);
         $slotLabelInv = ($weekdayNamesInv[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
         $msgInviter = $actorIsInviter
-            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meeting.you_canceled', $inviterLang))
-            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], $this->getMsg('meeting.canceled_by_user', $inviterLang));
+            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], __('messages.meeting.you_canceled', [], $inviterLang))
+            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelInv), $inviteeLink], __('messages.meeting.canceled_by_user', [], $inviterLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->inviter_tg,
             'text' => $msgInviter,
@@ -704,8 +694,8 @@ class MeetingController extends Controller
         $weekdayNamesIne = $this->getWeekdayNames($inviteeLang);
         $slotLabelIne = ($weekdayNamesIne[(int)$meeting->weekday_iso] ?? $meeting->weekday_iso) . ($dateHuman ? ', ' . $dateHuman : '') . ' ' . $meeting->time_local;
         $msgInvitee = !$actorIsInviter
-            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meeting.you_canceled', $inviteeLang))
-            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], $this->getMsg('meeting.canceled_by_user', $inviteeLang));
+            ? str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], __('messages.meeting.you_canceled', [], $inviteeLang))
+            : str_replace(['{{slot}}', '{{user}}'], [e($slotLabelIne), $inviterLink], __('messages.meeting.canceled_by_user', [], $inviteeLang));
         TelegramRequest::sendMessage([
             'chat_id' => (string)$meeting->invitee_tg,
             'text' => $msgInvitee,

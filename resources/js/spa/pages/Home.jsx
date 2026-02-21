@@ -1,17 +1,23 @@
 import React from 'react';
 
-export default function Home({ messages }) {
+export default function Home({ messages, botUrl }) {
   return (
     <>
-      <section className="text-white">
-        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+      <section className="text-white py-6">
+        <div className="max-w-6xl mx-auto px-6 py-16bullet">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1">
-              <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">{messages?.hero_title || 'Practice Hebrew with peers'}</h1>
-              <p className="text-lg md:text-xl opacity-95">{messages?.hero_subtitle || ''}</p>
-              <p className="text-lg md:text-xl opacity-95 mt-2">{messages?.hero_description || ''}</p>
+              <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">{messages?.hero_title || 'Practice Hebrew one-on-one'}</h1>
+              <ul className="text-lg md:text-xl opacity-95 space-y-2 text-left inline-block">
+                {[1, 2, 3, 4].map(n => (
+                  <li key={n} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/80 flex-shrink-0"></span>
+                    {messages?.[`hero_bullet_${n}`]}
+                  </li>
+                ))}
+              </ul>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="https://t.me/HebrewPeer2Peer_bot" className="inline-block px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{messages?.start_now || 'Start now'}</a>
+                <a href={botUrl} className="inline-block text-center px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{messages?.start_now || 'Start now'}</a>
               </div>
             </div>
             <div className="order-1 md:order-2 flex justify-center">
