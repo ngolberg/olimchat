@@ -111,6 +111,18 @@ function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUpl
                     </svg>
                     {messages?.update_photo || 'Update photo'}
                   </button>
+                  <a
+                    href={botUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setProfileOpen(false)}
+                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.08 14.5l-2.95-.924c-.64-.203-.654-.64.136-.948l11.526-4.445c.534-.194 1.001.13.77.065z"/>
+                    </svg>
+                    {messages?.go_to_bot || 'Go to the Bot'}
+                  </a>
                 </div>
               )}
             </div>
@@ -200,8 +212,9 @@ export default function App() {
       })
       .then((data) => {
         if (data.image) {
-          setUserImage(data.image);
-          setUploadedPreview(data.image);
+          const busted = `${data.image}?t=${Date.now()}`;
+          setUserImage(busted);
+          setUploadedPreview(busted);
         }
       })
       .catch(err => {

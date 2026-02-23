@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,14 +16,13 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 
 class MeetingController extends Controller
 {
-    /**
-     * @var Telegram
-     */
     private Telegram $telegram;
+    private LogService $log;
 
-    public function __construct(Telegram $telegram)
+    public function __construct(Telegram $telegram, LogService $log)
     {
         $this->telegram = $telegram;
+        $this->log = $log;
     }
 
     /**
@@ -121,7 +121,7 @@ class MeetingController extends Controller
                 'disable_web_page_preview' => true,
                 'reply_markup' => $kb,
             ]);
-            $this->logMeetingActivity('invite_sent_to_invitee', $inviteeBotUser->id, $inviterBotUser->id);
+            $this->log->log('invite_sent_to_invitee', $inviteeBotUser->id, $inviterBotUser->id);
 
             // Notify inviter
             $inviterLang = $inviterBotUser->lang ?: 'ru';
@@ -134,8 +134,8 @@ class MeetingController extends Controller
                 'parse_mode' => 'HTML',
                 'disable_web_page_preview' => true,
             ]);
-            $this->logMeetingActivity('invite_notify_inviter', $inviterBotUser->id, $inviteeBotUser->id);
-            $this->logMeetingActivity('invite_created', $inviterBotUser->id, $inviteeBotUser->id);
+            $this->log->log('invite_notify_inviter', $inviterBotUser->id, $inviteeBotUser->id);
+            $this->log->log('invite_created', $inviterBotUser->id, $inviteeBotUser->id);
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error creating meeting: ' . $e->getMessage()], 500);
@@ -155,20 +155,6 @@ class MeetingController extends Controller
             6 => __('messages.weekdays.6', [], $lang),
             7 => __('messages.weekdays.7', [], $lang),
         ];
-    }
-
-    private function logMeetingActivity(string $action, int $userId, ?int $addresseeId = null): void
-    {
-        try {
-            DB::connection('mysql_bot')->table('logs')->insert([
-                'action' => $action,
-                'user_id' => $userId,
-                'addressee_id' => $addresseeId,
-                'created_at' => now(),
-            ]);
-        } catch (\Exception $e) {
-            // ignore
-        }
     }
 
     /**
@@ -230,6 +216,14 @@ class MeetingController extends Controller
         if ($activeMatchingUsers->isEmpty()) {
             return response()->json(['days' => []]);
         }
+
+        // Fetch levels for matching users
+        $userLevels = DB::connection('mysql_bot')
+            ->table('user_levels')
+            ->whereIn('user_id', $activeMatchingUsers->keys())
+            ->get()
+            ->groupBy('user_id')
+            ->map(fn($rows) => $rows->pluck('level')->toArray());
 
         // Calculate slots for the next 7 days (Israel Time)
         $now = Carbon::now('Asia/Jerusalem');
@@ -304,6 +298,7 @@ class MeetingController extends Controller
                                 'last_name' => (string)$user->last_name,
                                 'username' => (string)$user->username,
                                 'image' => $user->image ? '/photos/' . (string)$user->image : '/img/logo.jpeg',
+                                'levels' => $userLevels->get($user->id, []),
                             ],
                             'time' => (string)$timeKey,
                             'meeting' => $meetingStatus ? [
@@ -475,7 +470,7 @@ class MeetingController extends Controller
             ->where('id', $meeting->id)
             ->update(['status' => 'accepted']);
 
-        $this->logMeetingActivity('invite_accepted', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
+        $this->log->log('invite_accepted', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
 
         $dateHuman = !empty($meeting->meeting_date) ? Carbon::parse($meeting->meeting_date, 'Asia/Jerusalem')->format('d.m.Y') : '';
 
@@ -500,7 +495,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('accept_notified_inviter', (int)$meeting->inviter_id, (int)$meeting->invitee_id);
+        $this->log->log('accept_notified_inviter', (int)$meeting->inviter_id, (int)$meeting->invitee_id);
 
         // Notify invitee: you confirmed
         $inviteeLang = $meeting->invitee_lang ?: 'ru';
@@ -513,7 +508,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('accept_notified_invitee', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
+        $this->log->log('accept_notified_invitee', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
 
         return response()->json(['success' => true]);
     }
@@ -568,7 +563,7 @@ class MeetingController extends Controller
             ->where('id', $meeting->id)
             ->update(['status' => 'declined']);
 
-        $this->logMeetingActivity('invite_declined', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
+        $this->log->log('invite_declined', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
 
         $dateHuman = !empty($meeting->meeting_date) ? Carbon::parse($meeting->meeting_date, 'Asia/Jerusalem')->format('d.m.Y') : '';
 
@@ -593,7 +588,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('decline_notified_inviter', (int)$meeting->inviter_id, (int)$meeting->invitee_id);
+        $this->log->log('decline_notified_inviter', (int)$meeting->inviter_id, (int)$meeting->invitee_id);
 
         // Notify invitee: you declined
         $inviteeLang = $meeting->invitee_lang ?: 'ru';
@@ -606,7 +601,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('decline_notified_invitee', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
+        $this->log->log('decline_notified_invitee', (int)$meeting->invitee_id, (int)$meeting->inviter_id);
 
         return response()->json(['success' => true]);
     }
@@ -659,7 +654,7 @@ class MeetingController extends Controller
 
         $actorId = (int)$botUser->id;
         $otherId = ((int)$meeting->inviter_id === $actorId) ? (int)$meeting->invitee_id : (int)$meeting->inviter_id;
-        $this->logMeetingActivity('meeting_canceled', $actorId, $otherId);
+        $this->log->log('meeting_canceled', $actorId, $otherId);
 
         $actorIsInviter = ((int)$meeting->inviter_id === $actorId);
         $dateHuman = !empty($meeting->meeting_date) ? Carbon::parse($meeting->meeting_date, 'Asia/Jerusalem')->format('d.m.Y') : '';
@@ -687,7 +682,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('cancellation_notified_inviter', (int)$meeting->inviter_id, $actorId);
+        $this->log->log('cancellation_notified_inviter', (int)$meeting->inviter_id, $actorId);
 
         // Notify invitee
         $inviteeLang = $meeting->invitee_lang ?: 'ru';
@@ -702,7 +697,7 @@ class MeetingController extends Controller
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
-        $this->logMeetingActivity('cancellation_notified_invitee', (int)$meeting->invitee_id, $actorId);
+        $this->log->log('cancellation_notified_invitee', (int)$meeting->invitee_id, $actorId);
 
         return response()->json(['success' => true]);
     }

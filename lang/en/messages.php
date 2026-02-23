@@ -28,7 +28,7 @@ return [
     'forbidden_title' => 'Access Prohibited',
     'forbidden_message' => 'To access this page, please use the personal link provided by our Telegram bot:',
     'upload_photo_title' => 'Upload a photo',
-    'upload_photo_message' => 'Your Telegram profile has no photo :( Please upload a photo so other participants know who they\'ll be talking to. This significantly increases your chances of finding a suitable conversation partner!',
+    'upload_photo_message' => 'Please upload a photo so other participants know who they\'ll be talking to. This significantly increases your chances of finding a suitable conversation partner!',
     'upload_photo_done' => 'Cool! Close the pop-up',
     'upload_photo_another' => 'Upload another',
     'update_photo' => 'Update photo',
@@ -47,6 +47,7 @@ return [
     'my_meetings_btn_cancel' => 'Cancel',
     'my_meetings_role_invited_you' => 'invited you',
     'my_meetings_role_you_invited' => 'you invited',
+    'go_to_bot' => 'Go to the Bot',
 
     // Telegram notification messages
     'meet.invite_wants_to_meet_prefix' => " wants to meet: ",

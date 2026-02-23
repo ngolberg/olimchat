@@ -326,6 +326,15 @@ export default function Meetings({ messages, botUrl, auth, user, userImage, onOp
                                   `${slot.user.first_name} ${slot.user.last_name}`
                                 )}
                               </h3>
+                              {slot.user.levels?.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {slot.user.levels.map(level => (
+                                    <span key={level} className="text-xs font-semibold bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">
+                                      {level}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                               {slot.meeting ? (
                                 <div className="mt-1">
                                   <div className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">

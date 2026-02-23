@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\LogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,13 @@ use Longman\TelegramBot\Request as TelegramRequest;
 
 class BotLoginController extends Controller
 {
+    private LogService $log;
+
+    public function __construct(LogService $log)
+    {
+        $this->log = $log;
+    }
+
     /**
      * Authenticate a user via bot token and redirect to a relative path.
      */
@@ -48,6 +56,8 @@ class BotLoginController extends Controller
                 'lang' => $user->lang ?? 'ru',
             ]
         );
+
+        $this->log->log('web_login', $user->id);
 
         if ($localUser->wasRecentlyCreated === false) {
             $updates = [];

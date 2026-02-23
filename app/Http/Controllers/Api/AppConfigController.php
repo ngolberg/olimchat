@@ -77,6 +77,7 @@ class AppConfigController extends Controller
                 'my_meetings_btn_cancel' => __('messages.my_meetings_btn_cancel'),
                 'my_meetings_role_invited_you' => __('messages.my_meetings_role_invited_you'),
                 'my_meetings_role_you_invited' => __('messages.my_meetings_role_you_invited'),
+                'go_to_bot' => __('messages.go_to_bot'),
             ],
             'auth' => Auth::check(),
         ]);
