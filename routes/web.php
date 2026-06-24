@@ -26,6 +26,13 @@ Route::get('/403', function () {
     return response()->view('errors.403', [], 403);
 })->name('forbidden');
 
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect('/meetings');
+    }
+    return view('spa');
+});
+
 Route::get('/{any}', function () {
     return view('spa');
 })->where('any', '.*');
