@@ -41,6 +41,10 @@ class BotLoginController extends Controller
             return redirect('/403');
         }
 
+        if (!empty($user->blocked)) {
+            return redirect('/403');
+        }
+
         // Authenticate the user in the Laravel app using a local User record
         $email = isset($user->tg_id)
             ? ('tg_' . $user->tg_id . '@olimchat.me')
@@ -70,6 +74,13 @@ class BotLoginController extends Controller
             if (!empty($updates)) {
                 $localUser->update($updates);
             }
+        }
+
+        if (isset($user->active) && (int) $user->active !== 1) {
+            DB::connection('mysql_bot')
+                ->table('users')
+                ->where('id', $user->id)
+                ->update(['active' => 1]);
         }
 
         if ($localUser->wasRecentlyCreated && !$user->image && $user->tg_id) {

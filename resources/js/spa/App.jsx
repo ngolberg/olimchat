@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import Meetings from './pages/Meetings.jsx';
 import MyMeetings from './pages/MyMeetings.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Forbidden from './pages/Forbidden.jsx';
 
 function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUploadModal }) {
   const location = useLocation();
@@ -136,7 +137,7 @@ function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUpl
 export default function App() {
   const [messages, setMessages] = useState({});
   const [botUrl, setBotUrl] = useState('');
-  const [auth, setAuth] = useState(false);
+  const [auth, setAuth] = useState(null);
   const [user, setUser] = useState(null);
   const [userImage, setUserImage] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -232,6 +233,7 @@ export default function App() {
           <Route path="/" element={<Home messages={messages} botUrl={botUrl} />} />
           <Route path="/meetings" element={<Meetings messages={messages} botUrl={botUrl} auth={auth} user={user} userImage={userImage} onOpenUploadModal={handleOpenUploadModal} />} />
           <Route path="/my-meetings" element={<MyMeetings messages={messages} botUrl={botUrl} auth={auth} user={user} />} />
+          <Route path="/403" element={<Forbidden messages={messages} botUrl={botUrl} />} />
           <Route path="*" element={<NotFound messages={messages} />} />
         </Routes>
       </main>

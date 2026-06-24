@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { Navigate } from 'react-router-dom';
 
 export default function Meetings({ messages, botUrl, auth, user, userImage, onOpenUploadModal }) {
   const [days, setDays] = useState(null);
@@ -186,17 +187,8 @@ export default function Meetings({ messages, botUrl, auth, user, userImage, onOp
     );
   }
 
-  if (!auth) {
-    return (
-      <section className="bg-gradient-to-br from-slate-50 to-slate-200/70 flex-grow py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-slate-200">
-            <p className="text-xl text-slate-600">Please sign in via Telegram bot to see your calendar.</p>
-            <a href={botUrl} className="mt-4 inline-block px-6 py-2 bg-sky-600 text-white rounded-lg">Open Bot</a>
-          </div>
-        </div>
-      </section>
-    );
+  if (auth === false) {
+    return <Navigate to="/403" replace />;
   }
 
   if (!days || days.length === 0) {

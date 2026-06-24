@@ -62,6 +62,8 @@ class AppConfigController extends Controller
                 'upload_photo_done' => __('messages.upload_photo_done'),
                 'upload_photo_another' => __('messages.upload_photo_another'),
                 'update_photo' => __('messages.update_photo'),
+                'forbidden_title' => __('messages.forbidden_title'),
+                'forbidden_message' => __('messages.forbidden_message'),
                 'not_found_title' => __('messages.not_found_title'),
                 'not_found_message' => __('messages.not_found_message'),
                 'not_found_go_calendar' => __('messages.not_found_go_calendar'),

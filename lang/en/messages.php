@@ -26,7 +26,7 @@ return [
     'date_format' => 'l, j F',
     'access_prohibited' => 'Access prohibited. Please, use the link from telegram bot :url',
     'forbidden_title' => 'Access Prohibited',
-    'forbidden_message' => 'To access this page, please use the personal link provided by our Telegram bot:',
+    'forbidden_message' => 'To access this page, please open our Telegram bot and tap the login button from the bot menu:',
     'upload_photo_title' => 'Upload a photo',
     'upload_photo_message' => 'Please upload a photo so other participants know who they\'ll be talking to. This significantly increases your chances of finding a suitable conversation partner!',
     'upload_photo_done' => 'Cool! Close the pop-up',

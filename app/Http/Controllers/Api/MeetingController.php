@@ -42,6 +42,10 @@ class MeetingController extends Controller
             ->where('tg_id', $localUser->tg_id)
             ->first();
 
+        if (!$inviterBotUser || !empty($inviterBotUser->blocked)) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
         $partnerId = $request->input('user_id');
         $inviteeBotUser = DB::connection('mysql_bot')
             ->table('users')

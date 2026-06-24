@@ -1,0 +1,35 @@
+import React from 'react';
+import { ArrowRight } from 'lucide-react';
+
+export default function Forbidden({ messages, botUrl }) {
+  return (
+    <section className="bg-gradient-to-br from-slate-50 to-slate-200/70 flex-grow flex items-center justify-center">
+      <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+        <div className="bg-white border border-slate-200 text-slate-900 p-6 md:p-8 rounded-2xl shadow-xl mb-8 w-full max-w-2xl">
+          <div className="flex justify-center mb-6">
+            <div className="bg-sky-50 p-4 rounded-full">
+              <svg className="w-12 h-12 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m12-3V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2h8m10-10l-10 8L2 7"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-slate-800">
+            {messages.forbidden_title}
+          </h1>
+          <p className="text-lg md:text-xl mb-4 leading-relaxed text-slate-600">
+            {messages.forbidden_message}
+          </p>
+          <img src="/img/howtologin.jpeg" alt="How to login" className="mx-auto rounded-xl shadow-md mb-8 max-w-[260px]" />
+          <a
+            href={botUrl}
+            className="inline-flex items-center gap-2 px-6 md:px-10 py-3 md:py-4 rounded-full bg-sky-600 text-white font-bold shadow-lg hover:bg-sky-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+          >
+            <span>@HebrewPeer2Peer_bot</span>
+            <ArrowRight className="w-5 h-5" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
