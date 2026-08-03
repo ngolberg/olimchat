@@ -3,6 +3,10 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Meetings from './pages/Meetings.jsx';
 import MyMeetings from './pages/MyMeetings.jsx';
+import Lesson from './pages/Lesson.jsx';
+import CreateLesson from './pages/CreateLesson.jsx';
+import MyLessons from './pages/MyLessons.jsx';
+import TopLessons from './pages/TopLessons.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Forbidden from './pages/Forbidden.jsx';
 
@@ -34,6 +38,7 @@ function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUpl
           <ul className="hidden sm:flex items-center gap-6 text-gray-700 font-medium">
             <li><Link to="/meetings" className="hover:text-sky-600 transition-colors">{messages?.calendar_title}</Link></li>
             <li><Link to="/my-meetings" className="hover:text-sky-600 transition-colors">{messages?.my_meetings_title}</Link></li>
+            {user && <li><Link to="/lessons" className="hover:text-sky-600 transition-colors">Top Lessons</Link></li>}
           </ul>
           {user && (
             <div className="flex gap-2 text-sm font-medium">
@@ -101,6 +106,28 @@ function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUpl
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                       {messages?.my_meetings_title}
+                    </Link>
+                  </div>
+                  <div className="py-1 border-b border-slate-100">
+                    <Link
+                      to="/lessons/create"
+                      onClick={() => setProfileOpen(false)}
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Create Lesson
+                    </Link>
+                    <Link
+                      to="/profile/lessons"
+                      onClick={() => setProfileOpen(false)}
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      My Lessons
                     </Link>
                   </div>
                   <button
@@ -233,6 +260,10 @@ export default function App() {
           <Route path="/" element={<Home messages={messages} botUrl={botUrl} />} />
           <Route path="/meetings" element={<Meetings messages={messages} botUrl={botUrl} auth={auth} user={user} userImage={userImage} onOpenUploadModal={handleOpenUploadModal} />} />
           <Route path="/my-meetings" element={<MyMeetings messages={messages} botUrl={botUrl} auth={auth} user={user} />} />
+          <Route path="/lesson/:hashId" element={<Lesson auth={auth} />} />
+          <Route path="/lessons/create" element={<CreateLesson auth={auth} />} />
+          <Route path="/lessons" element={<TopLessons auth={auth} />} />
+          <Route path="/profile/lessons" element={<MyLessons auth={auth} />} />
           <Route path="/403" element={<Forbidden messages={messages} botUrl={botUrl} />} />
           <Route path="*" element={<NotFound messages={messages} />} />
         </Routes>

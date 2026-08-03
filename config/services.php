@@ -38,7 +38,11 @@ return [
     'telegram' => [
         'bot_token' => env('BOT_TOKEN'),
         'bot_username' => env('BOT_USERNAME'),
-        'bot_url' => env('BOT_URL', 'https://t.me/HebrewPeer2Peer_bot'),
+        'bot_url' => env('BOT_URL', 'https://telegram.me/HebrewPeer2Peer_bot'),
+    ],
+
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
     ],
 
 ];

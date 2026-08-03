@@ -2,9 +2,10 @@
 
 
 use App\Http\Controllers\BotLoginController;
-use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\AppConfigController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\LessonController;
+use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\PhotoController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,16 @@ Route::prefix('api')->group(function () {
     Route::middleware('auth')->post('/meeting/decline', [MeetingController::class, 'decline']);
     Route::middleware('auth')->post('/meeting/cancel', [MeetingController::class, 'cancel']);
     Route::middleware('auth')->post('/user/photo', [PhotoController::class, 'store']);
+
+    Route::middleware('auth')->prefix('lessons')->group(function () {
+        Route::get('/',               [LessonController::class, 'index']);
+        Route::post('/',              [LessonController::class, 'store']);
+        Route::get('/top',            [LessonController::class, 'top']);
+        Route::get('/{hashId}',       [LessonController::class, 'show']);
+        Route::patch('/{hashId}',     [LessonController::class, 'update']);
+        Route::delete('/{hashId}',    [LessonController::class, 'destroy']);
+        Route::post('/{hashId}/rate', [LessonController::class, 'rate']);
+    });
 });
 
 Route::get('/botlogin', [BotLoginController::class, 'login'])->name('botlogin');
