@@ -1,5 +1,22 @@
 import React from 'react';
 
+// English defaults shown until /api/config loads the localized messages.
+const HERO_BULLETS = [
+  'Sign up via Telegram bot',
+  'Select your level (א/ב/ג/ד)',
+  'Choose convenient time-slots',
+  'Get a free speaking partner',
+];
+
+const STEPS = [
+  'Start the flow',
+  'Choose the language',
+  'Choose your levels',
+  'Select convenient time slots',
+  'See the matches',
+  'Schedule a meeting',
+];
+
 export default function Home({ messages, botUrl }) {
   return (
     <>
@@ -9,10 +26,10 @@ export default function Home({ messages, botUrl }) {
             <div className="order-2 md:order-1">
               <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">{messages?.hero_title || 'Practice Hebrew one-on-one'}</h1>
               <ul className="text-lg md:text-xl opacity-95 space-y-2 text-left inline-block">
-                {[1, 2, 3, 4].map(n => (
-                  <li key={n} className="flex items-center gap-2">
+                {HERO_BULLETS.map((fallback, i) => (
+                  <li key={i} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-white/80 flex-shrink-0"></span>
-                    {messages?.[`hero_bullet_${n}`]}
+                    {messages?.[`hero_bullet_${i + 1}`] || fallback}
                   </li>
                 ))}
               </ul>
@@ -34,7 +51,7 @@ export default function Home({ messages, botUrl }) {
             {[1,6,5,4,3,2].map((n, i) => (
               <figure key={i} className="bg-white rounded-xl shadow overflow-hidden group">
                 <img src={`/img/${n}.jpeg`} alt="Step" className="w-full h-auto object-contain" />
-                <figcaption className="p-4 text-center text-gray-700 font-medium">{messages?.[`step_${i+1}`] || `Step ${i+1}`}</figcaption>
+                <figcaption className="p-4 text-center text-gray-700 font-medium">{messages?.[`step_${i+1}`] || STEPS[i]}</figcaption>
               </figure>
             ))}
           </div>
