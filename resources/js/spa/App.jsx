@@ -6,7 +6,7 @@ import MyMeetings from './pages/MyMeetings.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Forbidden from './pages/Forbidden.jsx';
 
-function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUploadModal }) {
+function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUploadModal, onLogout }) {
   const location = useLocation();
   const currentLang = user?.lang || 'ru';
   const [profileOpen, setProfileOpen] = useState(false);
@@ -124,6 +124,17 @@ function Navbar({ messages, botUrl, user, userImage, onLanguageChange, onOpenUpl
                     </svg>
                     {messages?.go_to_bot || 'Go to the Bot'}
                   </a>
+                  <div className="mt-1 pt-1 border-t border-slate-100">
+                    <button
+                      onClick={() => { setProfileOpen(false); onLogout(); }}
+                      className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {messages?.logout || 'Log out'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -185,6 +196,19 @@ export default function App() {
       .catch(err => console.error(err));
   };
 
+  const handleLogout = () => {
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+      },
+      credentials: 'same-origin'
+    })
+      .catch(err => console.error(err))
+      .finally(() => { window.location.href = '/'; });
+  };
+
   const handleOpenUploadModal = () => {
     setUploadedPreview(null);
     setShowUploadModal(true);
@@ -227,7 +251,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-500 to-purple-600 text-gray-800">
-      <Navbar messages={messages} botUrl={botUrl} user={user} userImage={userImage} onLanguageChange={handleLanguageChange} onOpenUploadModal={handleOpenUploadModal} />
+      <Navbar messages={messages} botUrl={botUrl} user={user} userImage={userImage} onLanguageChange={handleLanguageChange} onOpenUploadModal={handleOpenUploadModal} onLogout={handleLogout} />
       <main className="flex-grow flex flex-col">
         <Routes>
           <Route path="/" element={<Home messages={messages} botUrl={botUrl} />} />

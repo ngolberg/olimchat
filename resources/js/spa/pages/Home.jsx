@@ -34,7 +34,7 @@ export default function Home({ messages, botUrl }) {
                 ))}
               </ul>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href={botUrl} className="inline-block text-center px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{messages?.start_now || 'Start now'}</a>
+                <a href={botUrl} className="inline-block text-center px-8 py-3 rounded-full bg-white text-indigo-600 font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition">{messages?.start_now || 'Start Now'}</a>
               </div>
             </div>
             <div className="order-1 md:order-2 flex justify-center">

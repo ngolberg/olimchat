@@ -48,6 +48,7 @@ return [
     'my_meetings_role_invited_you' => 'приглашает тебя',
     'my_meetings_role_you_invited' => 'ты пригласил(а)',
     'go_to_bot' => 'Перейти в бота',
+    'logout' => 'Выйти',
 
     // Telegram notification messages
     'meet.invite_wants_to_meet_prefix' => " хочет встретиться: ",
